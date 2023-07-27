@@ -1,0 +1,1 @@
+{"mappings":"ACAA,wBAGA","sources":["index.db2cae5a.css","src/css/style.css"],"sourcesContent":[".is-hidden {\n  display: none;\n}\n\n.error {\n  color: red;\n}\n\n/*# sourceMappingURL=index.db2cae5a.css.map */\n",".is-hidden{\n    display: none;\n}\n.error{\n    color: red;\n}"],"names":[],"version":3,"file":"index.db2cae5a.css.map"}
