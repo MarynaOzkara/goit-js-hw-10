@@ -1,94 +1,87 @@
-import { fetchBreeds } from './cat-api';
-import { fetchCatByBreed } from './cat-api';
-import './css/style.css';
-export let breedId; 
-
-// const BASE_URL = 'https://api.thecatapi.com/v1';
-// const KEY = 'live_Hx8ktcm4HlPDrS1GRWIi3bNhI3TJEE42Jh3p70JuRDlHt9ZNF2P1iv3LNdA1a34e';
+import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
 
 const selectBreeds = document.querySelector('.breed-select');
-const catInfo = document.querySelector('.cat-info');
+const catInfoDiv = document.querySelector('.cat-info');
 const loaderMassege = document.querySelector('.loader');
 const errorWarning = document.querySelector('.error');
 
-let storedBreeds = [];
 
-selectBreeds.classList.add('is-hidden');
 errorWarning.classList.add('is-hidden');
 loaderMassege.classList.add('is-hidden');
 
+// Запит за колекцією порід при завантаженні сторінки
+window.addEventListener('DOMContentLoaded', () => {
+  showLoader();
+  fetchBreeds()
+    .then(breeds => {
+      fillBreedsSelect(breeds);
+      hideLoader();
+    })
+    .catch(error => {
+      console.error('Error fetching breeds:', error);
+      showError();
+    });    
+});
 
-    fetchBreeds()
-    .then((data) => {
-        selectBreeds.classList.remove('is-hidden'); 
-            
-        //filter to only include those with an `image` object
-        data = data.filter(img=> img.image?.url!=null)
-            
-        storedBreeds = data;
-    
-        for (let i = 0; i < storedBreeds.length; i++) {
-        const breed = storedBreeds[i];
-        let option = document.createElement('option');
-        
-        //skip any breeds that don't have an image
-        if(!breed.image)continue
-        
-        //use the current array index
-        option.value = i;
-        option.innerHTML = `${breed.name}`;
-        option.id = `${breed.id}`;
-        selectBreeds.appendChild(option);
-        // let breedId = breed.id;
-        
-        // console.log(breedId);
-        }
-        //show the first breed by default
-        // showBreedImage(0)
-       
-        })
-        .catch((err) =>
-        console.log(err), 
-        selectBreeds.classList.add('is-hiddden'),
-    )
+// Заповнення селекту порід опціями
+function fillBreedsSelect(breeds) {
+  breeds.forEach(breed => {
+    const option = document.createElement('option');
+    option.value = breed.id;
+    option.textContent = breed.name;
+    selectBreeds.appendChild(option);
+  });
+}
 
-    selectBreeds.addEventListener('click', onClick);
-    function onClick() {
-        
-     let breedId = null;
-        for (let option of selectBreeds.options)
-        {
-            if (option.selected) {
-                breedId = option.id;
-                
-            }
-        }
-        console.log(breedId);   
-        fetchCatByBreed();  
-    }
-    
-// function createMarkup(arr) {
-//     return arr.map((name) => `<p>${name}</p>`).join('');
-    
-// }
+// Обробник події при зміні вибраної породи
+selectBreeds.addEventListener('change', () => {
+  showLoader();
+  const selectedBreedId = selectBreeds.value;
+  fetchCatByBreed(selectedBreedId)
+    .then(catData => {
+      showCatInfo(catData);
+      hideLoader();
+    })
+    .catch(error => {
+      console.error('Error fetching cat by breed:', error);
+      showError();
+    });
+});
 
-    // fetchCatByBreed()
-    // .then((data) => 
-    // console.log(data)
-    // )
-    // .catch((err) =>
-    // console.log(err)
-    // )
+// Відображення інформації про кота
+function showCatInfo(catData) {
+  if (!catData) {
+    showError();
+    return;
+  }
 
-    
+  const { breeds, url } = catData;
 
-        // function showBreedImage(i)
-        // {
-        //     let catImage = document.createElement('img'); 
-        //     catImage.src= storedBreeds[i].image.url;
-          
-        //   catInfo.textContent= storedBreeds[i].temperament
-          
-        // }    
+  const catInfoHTML = `
+    <img src="${url}" alt="${breeds[0].name}">
+    <h3>${breeds[0].name}</h3>
+    <p><strong>Description:</strong> ${breeds[0].description}</p>
+    <p><strong>Temperament:</strong> ${breeds[0].temperament}</p>
+  `;
+
+  catInfoDiv.innerHTML = catInfoHTML;
+}
+
+// Показати завантажувач
+function showLoader() {
+  loaderMassege.classList.remove('is-hidden');
+}
+
+// Приховати завантажувач
+function hideLoader() {
+  loaderMassege.classList.add('is-hidden');
+}
+
+// Показати повідомлення про помилку
+function showError() {
+  errorWarning.classList.remove('is-hidden');
+}
+
     
   
+    
