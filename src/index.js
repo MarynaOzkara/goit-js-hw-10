@@ -46,6 +46,7 @@ selectBreeds.addEventListener('change', () => {
     .catch(error => {
       console.error('Error fetching cat by breed:', error);
      showError();
+     hideCatInfo();
     });
 });
 
@@ -87,6 +88,11 @@ function hideLoader() {
 function showError() {
   // errorWarning.classList.remove('is-hidden');
   Notiflix.Notify.failure('Oops! Something went wrong! Try reloading the page!');
+}
+
+// Приховати інформацію  про котика
+function hideCatInfo() {
+  catInfoDiv.innerHTML = '';
 }
 
     
