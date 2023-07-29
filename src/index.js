@@ -54,6 +54,7 @@ selectBreeds.addEventListener('change', () => {
 function showCatInfo(catData) {
   if (!catData) {
     showError();
+    hideCatInfo();
     return;
   }
 
